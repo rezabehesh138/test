@@ -1,3549 +1,1462 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
->
-
-<title>نیوفیس | قیمت محصولات</title>
-
-
-<!-- =========================================================
-     SUPABASE
-     ========================================================= -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#CC3A63">
+<title>NEWFACE | استعلام قیمت</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<!-- =========================================================
-     BARCODE SCANNER
-     ========================================================= -->
-
-<script
-    src="https://unpkg.com/html5-qrcode"
-    type="text/javascript">
-</script>
-
-
-<!-- =========================================================
-     FONT
-     ========================================================= -->
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link
-    href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
->
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <style>
-
-/* =========================================================
-   VARIABLES
-   ========================================================= */
-
-:root{
-
-    --pink:#CC3A63;
-    --pink-dark:#A72D50;
-    --pink-light:#FCE9EF;
-
-    --bg:#F6F4F6;
-
-    --white:#FFFFFF;
-
-    --text:#202124;
-
-    --muted:#77777D;
-
-    --border:#E8E4E7;
-
-    --green:#18A66F;
-
-    --red:#D33A3A;
-
-    --glass:rgba(255,255,255,.72);
-
-}
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*{
-
-    box-sizing:border-box;
-
-    -webkit-tap-highlight-color:transparent;
-
-}
-
-
-html{
-
-    scroll-behavior:smooth;
-
-}
-
-
-body{
-
-    margin:0;
-
-    background:
-
-        radial-gradient(
-            circle at 90% 0%,
-            rgba(204,58,99,.09),
-            transparent 35%
-        ),
-
-        var(--bg);
-
-    color:var(--text);
-
-    font-family:"Vazirmatn",sans-serif;
-
-}
-
-
-button,
-input,
-textarea{
-
-    font-family:inherit;
-
-}
-
-
-button{
-
-    cursor:pointer;
-
-}
-
-
-/* =========================================================
-   APP
-   ========================================================= */
-
-.app{
-
-    width:100%;
-
-    max-width:560px;
-
-    min-height:100vh;
-
-    margin:auto;
-
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.header{
-
-    padding:24px 17px 25px;
-
-    color:white;
-
-    background:
-
-        linear-gradient(
-            135deg,
-            #CC3A63,
-            #B52E54
-        );
-
-    border-radius:
-        0 0 30px 30px;
-
-    box-shadow:
-        0 15px 40px rgba(204,58,99,.23);
-
-}
-
-
-.header-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:flex-start;
-
-    gap:10px;
-
-}
-
-
-.logo{
-
-    font-size:27px;
-
-    font-weight:800;
-
-    line-height:1.2;
-
-}
-
-
-.subtitle{
-
-    margin-top:4px;
-
-    font-size:10px;
-
-    opacity:.82;
-
-}
-
-
-/* =========================================================
-   STATUS AREA
-   ========================================================= */
-
-.status-row{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-}
-
-
-.status{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    padding:7px 10px;
-
-    border-radius:30px;
-
-    background:rgba(255,255,255,.14);
-
-    border:1px solid rgba(255,255,255,.16);
-
-    backdrop-filter:blur(12px);
-
-    -webkit-backdrop-filter:blur(12px);
-
-    font-size:9px;
-
-    white-space:nowrap;
-
-}
-
-
-.status-dot{
-
-    width:7px;
-
-    height:7px;
-
-    border-radius:50%;
-
-    background:#72FFAD;
-
-    box-shadow:
-        0 0 8px rgba(114,255,173,.8);
-
-}
-
-
-.cache-status{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:5px;
-
-    padding:7px 10px;
-
-    border-radius:30px;
-
-    background:rgba(255,255,255,.14);
-
-    border:1px solid rgba(255,255,255,.16);
-
-    backdrop-filter:blur(12px);
-
-    -webkit-backdrop-filter:blur(12px);
-
-    font-size:9px;
-
-    white-space:nowrap;
-
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-.search-box{
-
-    margin-top:20px;
-
-    padding:5px;
-
-    display:flex;
-
-    align-items:center;
-
-    background:#fff;
-
-    border-radius:17px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.14);
-
-}
-
-
-.search-input{
-
-    flex:1;
-
-    min-width:0;
-
-    height:48px;
-
-    padding:0 13px;
-
-    border:0;
-
-    outline:none;
-
-    background:transparent;
-
-    font-size:14px;
-
-    direction:rtl;
-
-}
-
-
-.search-input::placeholder{
-
-    color:#999;
-
-}
-
-
-.search-btn{
-
-    width:47px;
-
-    height:47px;
-
-    border:0;
-
-    border-radius:13px;
-
-    background:var(--pink);
-
-    color:#fff;
-
-    font-size:19px;
-
-}
-
-
-.search-btn:active{
-
-    transform:scale(.96);
-
-}
-
-
-/* =========================================================
-   CONTENT
-   ========================================================= */
-
-.content{
-
-    padding:20px 15px 45px;
-
-}
-
-
-.section-title{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin:4px 3px 10px;
-
-}
-
-
-.section-title h2{
-
-    margin:0;
-
-    font-size:15px;
-
-}
-
-
-.section-title span{
-
-    color:var(--muted);
-
-    font-size:10px;
-
-}
-
-
-/* =========================================================
-   GLASS CARD
-   ========================================================= */
-
-.card{
-
-    background:var(--glass);
-
-    border:1px solid rgba(255,255,255,.85);
-
-    border-radius:22px;
-
-    padding:16px;
-
-    box-shadow:
-        0 10px 35px rgba(0,0,0,.055);
-
-    backdrop-filter:blur(15px);
-
-    -webkit-backdrop-filter:blur(15px);
-
-}
-
-
-/* =========================================================
-   SCANNER
-   ========================================================= */
-
-.scanner-card{
-
-    padding:13px;
-
-}
-
-
-.scanner-box{
-
-    position:relative;
-
-    width:100%;
-
-    aspect-ratio:3 / 1;
-
-    min-height:120px;
-
-    max-height:175px;
-
-    overflow:hidden;
-
-    border-radius:18px;
-
-    background:#111;
-
-}
-
-
-#reader{
-
-    width:100%;
-
-    height:100%;
-
-}
-
-
-#reader video{
-
-    width:100% !important;
-
-    height:100% !important;
-
-    object-fit:cover !important;
-
-}
-
-
-#reader__dashboard{
-
-    display:none !important;
-
-}
-
-
-#reader__dashboard_section{
-
-    display:none !important;
-
-}
-
-
-#reader__scan_region{
-
-    width:100% !important;
-
-    height:100% !important;
-
-    border:0 !important;
-
-}
-
-
-#reader__scan_region img{
-
-    display:none !important;
-
-}
-
-
-/* اسکن باکس */
-
-.scan-frame{
-
-    position:absolute;
-
-    z-index:5;
-
-    top:50%;
-
-    left:50%;
-
-    width:82%;
-
-    height:60%;
-
-    transform:translate(-50%,-50%);
-
-    border:2px solid rgba(255,255,255,.9);
-
-    border-radius:15px;
-
-    pointer-events:none;
-
-    box-shadow:
-        0 0 0 999px rgba(0,0,0,.16);
-
-}
-
-
-.scan-line{
-
-    position:absolute;
-
-    left:7%;
-
-    right:7%;
-
-    top:50%;
-
-    height:2px;
-
-    background:var(--pink);
-
-    box-shadow:
-        0 0 10px rgba(204,58,99,.9);
-
-    animation:
-        scanLine 2s infinite ease-in-out;
-
-}
-
-
-@keyframes scanLine{
-
-    0%{
-
-        transform:translateY(-35px);
-
-        opacity:.4;
-
-    }
-
-    50%{
-
-        transform:translateY(35px);
-
-        opacity:1;
-
-    }
-
-    100%{
-
-        transform:translateY(-35px);
-
-        opacity:.4;
-
-    }
-
-}
-
-
-.scanner-ready{
-
-    position:absolute;
-
-    z-index:8;
-
-    right:10px;
-
-    top:10px;
-
-    padding:6px 9px;
-
-    border-radius:20px;
-
-    color:white;
-
-    font-size:8px;
-
-    background:rgba(0,0,0,.45);
-
-    backdrop-filter:blur(8px);
-
-}
-
-
-.scanner-control{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:8px;
-
-    margin-top:10px;
-
-}
-
-
-.scan-button{
-
-    height:47px;
-
-    border:0;
-
-    border-radius:13px;
-
-    background:var(--pink);
-
-    color:#fff;
-
-    font-size:11px;
-
-    font-weight:700;
-
-}
-
-
-.scan-button.stop{
-
-    background:#EFECEF;
-
-    color:#555;
-
-}
-
-
-.scan-help{
-
-    text-align:center;
-
-    margin-top:9px;
-
-    color:var(--muted);
-
-    font-size:9px;
-
-}
-
-
-/* =========================================================
-   PRODUCT RESULT
-   ========================================================= */
-
-.product{
-
-    display:none;
-
-    margin-top:17px;
-
-    overflow:hidden;
-
-    background:#fff;
-
-    border:1px solid var(--border);
-
-    border-radius:22px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.055);
-
-}
-
-
-.product-main{
-
-    padding:19px;
-
-}
-
-
-.code{
-
-    display:inline-block;
-
-    padding:5px 11px;
-
-    border-radius:20px;
-
-    background:var(--pink-light);
-
-    color:var(--pink-dark);
-
-    font-size:9px;
-
-    font-weight:700;
-
-    direction:ltr;
-
-}
-
-
-.product-name{
-
-    margin:12px 0 15px;
-
-    font-size:18px;
-
-    line-height:1.8;
-
-    font-weight:800;
-
-}
-
-
-.price-label{
-
-    color:var(--muted);
-
-    font-size:9px;
-
-}
-
-
-.price{
-
-    margin-top:2px;
-
-    color:var(--pink);
-
-    font-size:29px;
-
-    font-weight:800;
-
-}
-
-
-.toman{
-
-    color:var(--muted);
-
-    font-size:10px;
-
-    font-weight:500;
-
-}
-
-
-/* =========================================================
-   DESCRIPTION
-   ========================================================= */
-
-.description-box{
-
-    margin-top:17px;
-
-    padding-top:15px;
-
-    border-top:1px solid var(--border);
-
-}
-
-
-.description-title{
-
-    margin-bottom:7px;
-
-    color:var(--muted);
-
-    font-size:9px;
-
-}
-
-
-.description{
-
-    color:#4B4B50;
-
-    font-size:11px;
-
-    line-height:2;
-
-    white-space:pre-wrap;
-
-}
-
-
-.description.empty{
-
-    color:#999;
-
-}
-
-
-/* =========================================================
-   PREVIOUS
-   ========================================================= */
-
-.previous{
-
-    display:none;
-
-    margin:0 19px 17px;
-
-    padding:12px;
-
-    border-radius:13px;
-
-    background:#F7F7F8;
-
-    color:var(--muted);
-
-    font-size:10px;
-
-}
-
-
-.previous strong{
-
-    color:var(--text);
-
-}
-
-
-/* =========================================================
-   EDIT
-   ========================================================= */
-
-.edit{
-
-    display:none;
-
-    margin:0 19px 17px;
-
-    padding:15px;
-
-    border-radius:16px;
-
-    background:var(--pink-light);
-
-}
-
-
-.edit label{
-
-    display:block;
-
-    margin-bottom:7px;
-
-    color:var(--pink-dark);
-
-    font-size:9px;
-
-}
-
-
-.price-input,
-.description-input{
-
-    width:100%;
-
-    border:1px solid #E2A7B8;
-
-    border-radius:12px;
-
-    outline:none;
-
-    background:#fff;
-
-    padding:11px 13px;
-
-    font-size:13px;
-
-}
-
-
-.price-input{
-
-    height:46px;
-
-    direction:ltr;
-
-    text-align:right;
-
-}
-
-
-.description-input{
-
-    min-height:85px;
-
-    resize:vertical;
-
-    margin-top:10px;
-
-    direction:rtl;
-
-}
-
-
-.save-btn{
-
-    width:100%;
-
-    height:45px;
-
-    margin-top:9px;
-
-    border:0;
-
-    border-radius:12px;
-
-    background:var(--pink);
-
-    color:#fff;
-
-    font-weight:700;
-
-    font-size:11px;
-
-}
-
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.actions{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:9px;
-
-    padding:0 19px 19px;
-
-}
-
-
-.action{
-
-    min-height:47px;
-
-    border:1px solid var(--border);
-
-    border-radius:13px;
-
-    background:#fff;
-
-    font-size:10px;
-
-    font-weight:600;
-
-}
-
-
-.action.primary{
-
-    border:0;
-
-    background:var(--pink-light);
-
-    color:var(--pink-dark);
-
-}
-
-
-/* =========================================================
-   MULTIPLE RESULTS
-   ========================================================= */
-
-.results{
-
-    display:none;
-
-    margin-top:17px;
-
-}
-
-
-.result-list{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:8px;
-
-}
-
-
-.result-item{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:10px;
-
-    padding:13px;
-
-    border:1px solid var(--border);
-
-    border-radius:15px;
-
-    background:#fff;
-
-}
-
-
-.result-info{
-
-    min-width:0;
-
-}
-
-
-.result-code{
-
-    color:var(--pink-dark);
-
-    font-size:8px;
-
-    direction:ltr;
-
-}
-
-
-.result-name{
-
-    margin-top:3px;
-
-    font-size:11px;
-
-    font-weight:700;
-
-    line-height:1.7;
-
-}
-
-
-.result-price{
-
-    flex-shrink:0;
-
-    color:var(--pink);
-
-    font-size:11px;
-
-    font-weight:800;
-
-    direction:ltr;
-
-    white-space:nowrap;
-
-}
-
-
-/* =========================================================
-   NOT FOUND
-   ========================================================= */
-
-.not-found{
-
-    display:none;
-
-    padding:28px 10px;
-
-    text-align:center;
-
-    color:var(--muted);
-
-}
-
-
-.not-found-icon{
-
-    font-size:32px;
-
-}
-
-
-.not-found-title{
-
-    margin-top:7px;
-
-    color:var(--text);
-
-    font-size:14px;
-
-    font-weight:700;
-
-}
-
-
-/* =========================================================
-   CACHE
-   ========================================================= */
-
-.cache-section{
-
-    margin-top:23px;
-
-}
-
-
-.cache-button{
-
-    width:100%;
-
-    min-height:54px;
-
-    border:1px solid var(--border);
-
-    border-radius:14px;
-
-    background:#fff;
-
-    color:var(--text);
-
-    font-size:11px;
-
-    font-weight:700;
-
-}
-
-
-.cache-button:active{
-
-    transform:scale(.99);
-
-}
-
-
-.cache-info{
-
-    margin-top:9px;
-
-    padding:11px;
-
-    border-radius:13px;
-
-    background:var(--pink-light);
-
-    color:var(--pink-dark);
-
-    font-size:9px;
-
-    line-height:1.9;
-
-}
-
-
-.cache-progress{
-
-    display:none;
-
-    margin-top:9px;
-
-    height:5px;
-
-    overflow:hidden;
-
-    border-radius:10px;
-
-    background:#E8E5E7;
-
-}
-
-
-.cache-progress-bar{
-
-    width:0%;
-
-    height:100%;
-
-    background:var(--pink);
-
-    transition:.2s;
-
-}
-
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-
-.toast{
-
-    position:fixed;
-
-    left:15px;
-
-    right:15px;
-
-    bottom:18px;
-
-    z-index:20000;
-
-    padding:13px;
-
-    border-radius:14px;
-
-    background:#222;
-
-    color:#fff;
-
-    text-align:center;
-
-    font-size:10px;
-
-    transform:translateY(100px);
-
-    opacity:0;
-
-    transition:.3s;
-
-}
-
-
-.toast.show{
-
-    transform:translateY(0);
-
-    opacity:1;
-
-}
-
-
-/* =========================================================
-   DESKTOP
-   ========================================================= */
-
-@media(min-width:600px){
-
-    body{
-
-        padding:20px 0;
-
-    }
-
-
-    .app{
-
-        min-height:calc(100vh - 40px);
-
-        overflow:hidden;
-
-        border-radius:30px;
-
-        box-shadow:
-            0 20px 60px rgba(0,0,0,.08);
-
-    }
-
+:root {
+    --primary: #CC3A63;
+    --primary-dark: #A92F50;
+    --primary-soft: #FFF2F5;
+    --success: #18834D;
+    --success-soft: #ECF9F2;
+    --danger: #C62828;
+    --danger-soft: #FFF0F0;
+    --warning: #A56A00;
+    --warning-soft: #FFF7E5;
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --text: #202124;
+    --muted: #777B82;
+    --border: #E7E7EA;
+    --radius: 18px;
+    --shadow: 0 4px 18px rgba(0,0,0,.055);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Tahoma, Arial, "Segoe UI", sans-serif;
+    line-height: 1.7;
+}
+button, input, textarea { font-family: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+
+.app { width: 100%; max-width: 720px; min-height: 100vh; margin: 0 auto; }
+
+/* ============================================================
+   HEADER (بزرگ‌تر، شامل باکس جستجو)
+============================================================ */
+.header {
+    position: relative;
+    background: linear-gradient(135deg, #CC3A63 0%, #B83157 100%);
+    color: white;
+    padding: calc(20px + env(safe-area-inset-top)) 18px 24px;
+    border-radius: 0 0 28px 28px;
+    box-shadow: 0 7px 24px rgba(204,58,99,.18);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.brand { min-width: 0; }
+.brand-name { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 900; letter-spacing: 1px; }
+.brand-description { margin: 5px 0 0; font-size: 12px; opacity: .9; }
+
+.status-dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: #5DFFAE;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.18);
+    transition: background .25s ease;
+    flex-shrink: 0;
+}
+.status-dot.offline { background: #FF6B6B; }
+
+/* باکس جستجوی واحد، مدرن، داخل هدر */
+.header-search {
+    position: relative;
+    margin-top: 18px;
+}
+.header-search-icon {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    font-size: 17px;
+    opacity: .85;
+    pointer-events: none;
+}
+.header-search-input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 18px;
+    background: rgba(255,255,255,.14);
+    backdrop-filter: blur(6px);
+    color: white;
+    outline: none;
+    padding: 0 50px 0 18px;
+    font-size: 14px;
+    font-weight: 700;
+}
+.header-search-input::placeholder { color: rgba(255,255,255,.75); font-weight: 500; }
+.header-search-input:focus {
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.5);
+}
+
+/* بنر آفلاین */
+.offline-banner {
+    position: sticky; top: 0; z-index: 500;
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--danger-soft); color: var(--danger);
+    padding: 10px 14px; font-size: 12px; font-weight: 700;
+    animation: slideDown .25s ease;
+}
+.offline-banner.show { display: flex; }
+@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.offline-banner button {
+    flex-shrink: 0; border: 0; background: var(--danger); color: white;
+    border-radius: 9px; padding: 6px 10px; font-size: 11px; font-weight: 800;
+}
+
+/* MAIN */
+main { padding: 16px 13px 35px; }
+.section { margin-bottom: 14px; }
+.card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 17px;
+}
+.section-heading { margin-bottom: 14px; }
+.section-title { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 900; }
+.section-description { margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+
+/* دکمه‌ی اسکن */
+.scanner-button {
+    width: 100%; min-height: 54px; border: 0; border-radius: 14px;
+    background: var(--primary); color: white; font-size: 16px; font-weight: 900;
+    box-shadow: 0 5px 14px rgba(204,58,99,.18);
+}
+.scanner-button:active { transform: scale(.985); }
+
+/* ============================================================
+   اسکنر داخل صفحه (نه Overlay مشکی) - اسلاید به پایین
+============================================================ */
+.scanner-inline {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .32s ease;
+    margin-top: 0;
+}
+.scanner-inline.open {
+    grid-template-rows: 1fr;
+    margin-top: 12px;
+}
+.scanner-inline-content { overflow: hidden; min-height: 0; }
+
+.scanner-box {
+    position: relative;
+    background: #171717;
+    border-radius: 16px;
+    padding: 10px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity .28s ease .05s, transform .28s ease .05s;
+}
+.scanner-inline.open .scanner-box { opacity: 1; transform: translateY(0); }
+
+#reader { width: 100%; border-radius: 12px; overflow: hidden; background: #111; }
+#reader video { border-radius: 12px; }
+
+.scan-frame {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 78%; max-width: 300px; height: 78px;
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    pointer-events: none;
+}
+.scan-line {
+    position: absolute; left: 6%; right: 6%; top: 5px; height: 2px;
+    background: var(--primary); box-shadow: 0 0 8px var(--primary);
+    animation: scanMove 1.6s ease-in-out infinite;
+}
+@keyframes scanMove { 0% { top: 5px; } 50% { top: calc(100% - 7px); } 100% { top: 5px; } }
+
+.scanner-help { color: #DDD; font-size: 10px; text-align: center; padding: 9px 4px 4px; }
+.scanner-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding-top: 4px; }
+.scanner-actions.hide { display: none; }
+
+/* STATUS */
+.status { display: none; margin-top: 10px; padding: 10px 12px; border-radius: 11px; font-size: 11px; line-height: 1.6; }
+.status.show { display: block; }
+.status.success { background: var(--success-soft); color: var(--success); }
+.status.error { background: var(--danger-soft); color: var(--danger); }
+.status.warning { background: var(--warning-soft); color: var(--warning); }
+
+/* لیست نتایج جستجوی نام */
+.results-list { display: none; margin-top: 12px; border: 1px solid var(--border); border-radius: 13px; overflow: hidden; }
+.results-list.show { display: block; }
+.result-item {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: white; border: 0; border-bottom: 1px solid var(--border);
+    padding: 12px 13px; font-size: 13px; text-align: right;
+}
+.result-item:last-child { border-bottom: 0; }
+.result-item:active { background: var(--primary-soft); }
+.result-name { flex: 1; min-width: 0; }
+.result-price { flex-shrink: 0; color: var(--primary); font-weight: 800; direction: ltr; }
+
+/* PRODUCT */
+.product-card { display: none; margin-top: 12px; position: relative; overflow: hidden; animation: productAppear .2s ease; }
+.product-card.show { display: block; }
+@keyframes productAppear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.card-timer-bar { position: absolute; top: 0; right: 0; left: 0; height: 3px; background: var(--primary); width: 100%; transform-origin: right; }
+.card-timer-bar.running { transition: transform linear; transform: scaleX(0); }
+
+.product-label { color: var(--muted); font-size: 10px; font-weight: 700; }
+.product-name { margin: 2px 0 10px; font-size: 18px; line-height: 1.65; font-weight: 900; }
+
+/* توضیحات - همیشه حاضر و قابل ویرایش */
+.description-box { margin-bottom: 13px; }
+.description-view {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    color: var(--muted); font-size: 11.5px; line-height: 1.7;
+}
+.description-text { flex: 1; min-width: 0; }
+.description-text.empty { font-style: italic; opacity: .75; }
+.description-edit-btn {
+    flex-shrink: 0; border: 0; background: var(--primary-soft); color: var(--primary-dark);
+    border-radius: 9px; padding: 5px 9px; font-size: 10px; font-weight: 800;
+}
+.description-editor { display: none; margin-top: 8px; }
+.description-editor.show { display: block; }
+.description-textarea {
+    width: 100%; min-height: 64px; border: 2px solid var(--border); border-radius: 11px;
+    outline: none; padding: 10px 12px; font-size: 12px; resize: vertical; line-height: 1.7;
+}
+.description-textarea:focus { border-color: var(--primary); }
+.description-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 7px; }
+
+.price-area { padding: 13px 14px; background: var(--primary-soft); border-radius: 13px; margin-bottom: 11px; }
+.price-label { color: var(--primary-dark); font-size: 10px; font-weight: 700; }
+.current-price { margin-top: 1px; color: var(--primary); font-size: 28px; line-height: 1.3; font-weight: 900; }
+
+.code-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding-bottom: 13px; border-bottom: 1px solid var(--border);
+}
+.code-label { color: var(--muted); font-size: 10px; }
+.product-code {
+    direction: ltr; text-align: center; background: #F3F3F5;
+    border-radius: 8px; padding: 3px 8px; font-family: monospace; font-size: 13px; font-weight: 700;
+}
+
+.product-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+
+.previous-price {
+    display: none; margin-top: 10px; padding: 10px 12px; border-radius: 11px;
+    background: #FFF8FA; border: 1px solid #F1D4DD; color: #7E3A4D; font-size: 11px;
+}
+.previous-price.show { display: block; }
+
+.btn { min-height: 46px; border: 0; border-radius: 12px; padding: 9px 12px; font-size: 12px; font-weight: 800; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-secondary { background: #F1F1F3; color: #333; }
+
+.edit-box { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.edit-box.show { display: block; }
+.input-label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; }
+.price-input {
+    width: 100%; height: 49px; border: 2px solid var(--border); border-radius: 11px;
+    outline: none; direction: ltr; text-align: left; padding: 0 12px; font-size: 17px; font-weight: 700;
+}
+.price-input:focus { border-color: var(--primary); }
+.edit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+
+/* EXCEL */
+.file-picker { position: relative; overflow: hidden; width: 100%; }
+.file-picker input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.file-button {
+    min-height: 51px; display: flex; align-items: center; justify-content: center;
+    border: 2px dashed #DADADF; border-radius: 12px; background: #FAFAFB; color: #555;
+    font-size: 12px; font-weight: 800;
+}
+.excel-info { margin-top: 8px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+
+.preview { display: none; margin-top: 13px; }
+.preview.show { display: block; }
+.preview-summary {
+    padding: 11px 12px; background: var(--primary-soft); color: var(--primary-dark);
+    border-radius: 11px; font-size: 12px; font-weight: 800; margin-bottom: 9px;
+}
+.table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 11px; }
+table { width: 100%; min-width: 430px; border-collapse: collapse; font-size: 10px; }
+th, td { padding: 8px 9px; border-bottom: 1px solid var(--border); white-space: nowrap; text-align: right; }
+th { background: #F7F7F8; font-weight: 900; }
+td.barcode-cell { direction: ltr; text-align: center; font-family: monospace; }
+.import-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 9px; }
+
+.progress { display: none; margin-top: 11px; }
+.progress.show { display: block; }
+.progress-top { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--muted); font-size: 10px; }
+.progress-bar { height: 9px; overflow: hidden; background: #ECECEF; border-radius: 99px; }
+.progress-fill { width: 0%; height: 100%; background: var(--primary); border-radius: inherit; transition: width .2s ease; }
+
+.technical-error {
+    display: none; margin-top: 10px; background: #222; color: #EEE; border-radius: 10px;
+    padding: 10px; direction: ltr; text-align: left; font-family: monospace; font-size: 9px;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.technical-error.show { display: block; }
+
+.loading-overlay {
+    position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center;
+    background: rgba(255,255,255,.82); backdrop-filter: blur(3px);
+}
+.loading-overlay.show { display: flex; }
+.loading-card { width: 210px; padding: 23px; background: white; border-radius: 17px; box-shadow: var(--shadow); text-align: center; }
+.spinner {
+    width: 34px; height: 34px; margin: 0 auto 10px; border: 4px solid #EEEEF0;
+    border-top-color: var(--primary); border-radius: 50%; animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 12px; font-weight: 800; }
+
+.footer { padding: 5px 20px 28px; text-align: center; color: #AAA; font-size: 9px; }
+
+@media (min-width:700px) {
+    main { padding-top: 22px; }
+    .header { padding-left: 25px; padding-right: 25px; }
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <div class="app">
 
-
-<!-- =========================================================
-     HEADER
-     ========================================================= -->
-
 <header class="header">
-
-
-    <div class="header-top">
-
-
-        <div>
-
-            <div class="logo">
-                نیوفیس
-            </div>
-
-            <div class="subtitle">
-                استعلام سریع قیمت محصولات
-            </div>
-
+    <div class="header-inner">
+        <div class="brand">
+            <h1 class="brand-name">NEWFACE</h1>
+            <p class="brand-description">استعلام قیمت محصولات</p>
         </div>
-
-
-        <div class="status-row">
-
-
-            <div class="status">
-
-                <span class="status-dot"></span>
-
-                آنلاین
-
-            </div>
-
-
-            <div
-                id="cacheStatus"
-                class="cache-status">
-
-                کش: آماده
-
-            </div>
-
-
-        </div>
-
-
+        <div id="statusDot" class="status-dot"></div>
     </div>
 
-
-    <div class="search-box">
-
-
-        <input
-            id="searchInput"
-            class="search-input"
-            type="text"
-            autocomplete="off"
-            placeholder="کد یا نام کالا..."
-        >
-
-
-        <button
-            class="search-btn"
-            onclick="searchProduct()">
-
-            🔎
-
-        </button>
-
-
+    <div class="header-search">
+        <input id="unifiedSearchInput" class="header-search-input" type="text"
+            autocomplete="off" autocorrect="off" spellcheck="false"
+            placeholder="جستجو با بارکد یا نام کالا...">
+        <span class="header-search-icon">🔎</span>
     </div>
-
-
 </header>
 
-
-<!-- =========================================================
-     CONTENT
-     ========================================================= -->
-
-<main class="content">
-
-
-<!-- =========================================================
-     SCANNER
-     ========================================================= -->
-
-<div class="section-title">
-
-    <h2>
-        اسکن محصول
-    </h2>
-
-    <span>
-        بارکدخوان
-    </span>
-
+<div id="offlineBanner" class="offline-banner">
+    <span id="offlineBannerText">🔴 اتصال به دیتابیس برقرار نیست</span>
+    <button id="retryConnectionButton" type="button">تلاش مجدد</button>
 </div>
 
+<main>
 
-<div class="card scanner-card">
+<!-- SEARCH / SCAN -->
+<section class="section">
+<div class="card">
 
+<div class="section-heading">
+    <h2 class="section-title">🔎 استعلام قیمت</h2>
+    <p class="section-description">بارکد را اسکن کنید، یا از باکس جستجوی بالای صفحه استفاده کنید.</p>
+</div>
 
+<button id="startScannerButton" class="scanner-button" type="button">📷 اسکن بارکد</button>
+
+<div id="scannerInline" class="scanner-inline">
+<div class="scanner-inline-content">
     <div class="scanner-box">
-
-
-        <div
-            id="reader">
+        <div id="reader"></div>
+        <div class="scan-frame"><div class="scan-line"></div></div>
+        <div class="scanner-help">دوربین را مقابل بارکد قرار دهید</div>
+        <div id="scannerActions" class="scanner-actions hide">
+            <button id="retryScannerButton" class="btn btn-primary" type="button">🔄 تلاش مجدد</button>
+            <button id="closeScannerButton" class="btn btn-secondary" type="button">بستن</button>
         </div>
-
-
-        <div class="scan-frame">
-
-            <div class="scan-line"></div>
-
-        </div>
-
-
-        <div class="scanner-ready">
-
-            آماده اسکن
-
-        </div>
-
-
     </div>
-
-
-    <div class="scanner-control">
-
-
-        <button
-            id="scanStartBtn"
-            class="scan-button"
-            onclick="startScanner()">
-
-            📷 شروع اسکن
-
-        </button>
-
-
-        <button
-            id="scanStopBtn"
-            class="scan-button stop"
-            onclick="stopScanner()">
-
-            توقف
-
-        </button>
-
-
-    </div>
-
-
-    <div class="scan-help">
-
-        بارکد یک‌بعدی را داخل محدوده قرار دهید
-
-    </div>
-
-
+</div>
 </div>
 
+<div id="searchStatus" class="status"></div>
 
-<!-- =========================================================
-     MULTIPLE SEARCH RESULTS
-     ========================================================= -->
+<div id="resultsList" class="results-list"></div>
 
-<div
-    id="results"
-    class="results">
+<div id="productCard" class="product-card card">
+    <div id="cardTimerBar" class="card-timer-bar"></div>
 
+    <div class="product-label">نام کامل کالا</div>
+    <div id="productName" class="product-name">-</div>
 
-    <div class="section-title">
-
-        <h2>
-            نتایج جستجو
-        </h2>
-
-        <span id="resultCount">
-            0 مورد
-        </span>
-
-    </div>
-
-
-    <div
-        id="resultList"
-        class="result-list">
-    </div>
-
-
-</div>
-
-
-<!-- =========================================================
-     PRODUCT
-     ========================================================= -->
-
-<div
-    id="product"
-    class="product">
-
-
-    <div class="product-main">
-
-
-        <div
-            id="productCode"
-            class="code">
+    <div class="description-box">
+        <div class="description-view">
+            <div id="productDescription" class="description-text empty">توضیحی ثبت نشده است.</div>
+            <button id="editDescriptionButton" class="description-edit-btn" type="button">✏️ ویرایش</button>
         </div>
-
-
-        <div
-            id="productName"
-            class="product-name">
-        </div>
-
-
-        <div class="price-label">
-            قیمت فعلی
-        </div>
-
-
-        <div class="price">
-
-            <span id="productPrice"></span>
-
-            <span class="toman">
-                ریال
-            </span>
-
-        </div>
-
-
-        <div class="description-box">
-
-
-            <div class="description-title">
-                توضیحات
+        <div id="descriptionEditor" class="description-editor">
+            <textarea id="descriptionTextarea" class="description-textarea" placeholder="توضیحات کوتاه درباره‌ی محصول..."></textarea>
+            <div class="description-actions">
+                <button id="saveDescriptionButton" class="btn btn-primary" type="button">💾 ذخیره</button>
+                <button id="cancelDescriptionButton" class="btn btn-secondary" type="button">لغو</button>
             </div>
-
-
-            <div
-                id="productDescription"
-                class="description">
-            </div>
-
-
         </div>
-
-
     </div>
 
-
-    <!-- PREVIOUS PRICE -->
-
-    <div
-        id="previous"
-        class="previous">
-
-        قیمت قبلی:
-
-        <strong id="previousPrice"></strong>
-
-        ریال
-
+    <div class="price-area">
+        <div class="price-label">فروش نقدی</div>
+        <div id="currentPrice" class="current-price">-</div>
     </div>
 
-
-    <!-- EDIT -->
-
-    <div
-        id="edit"
-        class="edit">
-
-
-        <label>
-            قیمت جدید
-        </label>
-
-
-        <input
-            id="newPrice"
-            class="price-input"
-            type="text"
-            inputmode="numeric"
-            placeholder="مثلاً 3500000"
-        >
-
-
-        <label style="margin-top:12px;">
-
-            توضیحات محصول
-
-        </label>
-
-
-        <textarea
-            id="newDescription"
-            class="description-input"
-            placeholder="توضیحات محصول را وارد کنید...">
-        </textarea>
-
-
-        <button
-            class="save-btn"
-            onclick="savePrice()">
-
-            ذخیره تغییرات
-
-        </button>
-
-
+    <div class="code-row">
+        <span class="code-label">بارکد</span>
+        <span id="productCode" class="product-code">-</span>
     </div>
 
-
-    <div class="actions">
-
-
-        <button
-            class="action primary"
-            onclick="toggleEdit()">
-
-            ✎ ویرایش
-
-        </button>
-
-
-        <button
-            class="action"
-            onclick="togglePrevious()">
-
-            ◷ قیمت قبلی
-
-        </button>
-
-
+    <div id="previousPriceBox" class="previous-price">
+        <strong>قیمت قبلی:</strong> <span id="previousPrice">-</span>
     </div>
 
+    <div class="product-actions">
+        <button id="editPriceButton" class="btn btn-primary" type="button">✏️ ویرایش قیمت</button>
+        <button id="previousPriceButton" class="btn btn-secondary" type="button">مشاهده قیمت قبلی</button>
+    </div>
 
+    <div id="editBox" class="edit-box">
+        <label class="input-label" for="newPriceInput">قیمت جدید به ریال</label>
+        <input id="newPriceInput" class="price-input" type="text" inputmode="numeric"
+            autocomplete="off" placeholder="مثلاً ۳۵۰۰۰۰۰">
+        <div class="edit-actions">
+            <button id="savePriceButton" class="btn btn-primary" type="button">💾 ذخیره</button>
+            <button id="cancelEditButton" class="btn btn-secondary" type="button">لغو</button>
+        </div>
+    </div>
 </div>
 
-
-<!-- =========================================================
-     NOT FOUND
-     ========================================================= -->
-
-<div
-    id="notFound"
-    class="not-found">
-
-
-    <div class="not-found-icon">
-        🔍
-    </div>
-
-
-    <div class="not-found-title">
-        محصول پیدا نشد
-    </div>
-
-
-    <div>
-        کد یا نام واردشده در دیتابیس وجود ندارد.
-    </div>
-
+<div id="technicalError" class="technical-error"></div>
 
 </div>
+</section>
 
+<!-- EXCEL -->
+<section class="section">
+<div class="card">
 
-<!-- =========================================================
-     CACHE DOWNLOAD
-     ========================================================= -->
-
-<div class="cache-section">
-
-
-    <div class="section-title">
-
-        <h2>
-            جستجوی سریع
-        </h2>
-
-        <span>
-            حافظه دستگاه
-        </span>
-
-    </div>
-
-
-    <div class="card">
-
-
-        <button
-            class="cache-button"
-            onclick="downloadCache()">
-
-            ⚡ دانلود کش محصولات
-
-        </button>
-
-
-        <div class="cache-info">
-
-            با این گزینه نام و کد تمام محصولات
-            در حافظه مرورگر ذخیره می‌شود.
-            جستجوی نام محصولات بعد از آن بسیار سریع‌تر انجام می‌شود.
-
-            <br>
-
-            قیمت‌ها از دیتابیس اصلی خوانده می‌شوند.
-
-        </div>
-
-
-        <div
-            id="cacheProgress"
-            class="cache-progress">
-
-            <div
-                id="cacheProgressBar"
-                class="cache-progress-bar">
-            </div>
-
-        </div>
-
-
-    </div>
-
+<div class="section-heading">
+    <h2 class="section-title">📊 ورود اطلاعات از Excel</h2>
+    <p class="section-description">
+        ستون‌های لازم: «بارکد»، «نام کامل کالا»، «فروش نقدی». ستون «توضیحات» اختیاری است.
+    </p>
 </div>
 
+<div class="file-picker">
+    <div class="file-button">📁 انتخاب فایل Excel</div>
+    <input id="excelFileInput" type="file" accept=".xlsx,.xls,.csv">
+</div>
+
+<div class="excel-info">
+    بارکدهایی مانند <b>(0010)</b> به <b>0010</b> تبدیل می‌شوند. صفرهای ابتدای بارکد حفظ می‌شوند.
+</div>
+
+<div id="excelStatus" class="status"></div>
+
+<div id="previewBox" class="preview">
+    <div id="previewSummary" class="preview-summary"></div>
+    <div class="table-container">
+        <table>
+            <thead><tr><th>بارکد</th><th>نام کامل کالا</th><th>فروش نقدی</th></tr></thead>
+            <tbody id="previewTableBody"></tbody>
+        </table>
+    </div>
+    <div class="import-actions">
+        <button id="cancelImportButton" class="btn btn-secondary" type="button">لغو</button>
+        <button id="startImportButton" class="btn btn-primary" type="button">شروع وارد کردن</button>
+    </div>
+    <div id="progressContainer" class="progress">
+        <div class="progress-top">
+            <span id="progressText">در حال وارد کردن...</span>
+            <span id="progressCount">0 / 0</span>
+        </div>
+        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+    </div>
+</div>
+
+</div>
+</section>
 
 </main>
 
+<footer class="footer">NEWFACE • Product Price Lookup</footer>
+
 </div>
 
-
-<!-- =========================================================
-     TOAST
-     ========================================================= -->
-
-<div
-    id="toast"
-    class="toast">
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-card">
+        <div class="spinner"></div>
+        <div id="loadingText" class="loading-text">در حال پردازش...</div>
+    </div>
 </div>
-
 
 <script>
 
+/* ============================================================
+   SUPABASE CONFIGURATION
+============================================================ */
+const SUPABASE_URL = "https://vkemkkfrwnrryjjusdzz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_8UpdF44MA0JLIhkQKMhM2A_gC3pNWKE";
 
-/* =========================================================
-   1. SUPABASE SETTINGS
+let db = null;
+try {
+    if (typeof supabase !== "undefined") {
+        db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+} catch (error) {
+    console.error("Supabase init error:", error);
+}
 
-   فقط این دو خط را تغییر بده
-   ========================================================= */
-
-const SUPABASE_URL =
-    "https://vkemkkfrwnrryjjusdzz.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_8UpdF44MA0JLIhkQKMhM2A_gC3pNWKE";
-
-
-/* =========================================================
-   2. CREATE SUPABASE CLIENT
-
-   این قسمت مطابق کد مادر است
-   ========================================================= */
-
-const db =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-/* =========================================================
-   VARIABLES
-   ========================================================= */
-
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+let databaseOnline = false;
 let currentProduct = null;
-
 let scanner = null;
+let scannerRunning = false;
+let importedProducts = [];
+let importInProgress = false;
+let lastDetectedCode = "";
+let lastDetectedTime = 0;
+let autoHideTimer = null;
+let searchDebounceTimer = null;
 
-let localCache = [];
+const IMPORT_BATCH_SIZE = 500;
+const AUTO_HIDE_MS = 10000;
+const SEARCH_DEBOUNCE_MS = 300;
 
-let cacheLoaded = false;
+function $(id) { return document.getElementById(id); }
 
-let searchTimer = null;
+/* ============================================================
+   LOADING / STATUS HELPERS
+============================================================ */
+function showLoading(message) {
+    $("loadingText").textContent = message || "در حال پردازش...";
+    $("loadingOverlay").classList.add("show");
+}
+function hideLoading() { $("loadingOverlay").classList.remove("show"); }
 
+function showStatus(id, message, type = "success") {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "status show " + type;
+}
+function hideStatus(id) {
+    const el = $(id);
+    el.textContent = "";
+    el.className = "status";
+}
 
-/* =========================================================
-   PRICE FORMAT
-   ========================================================= */
+function showTechnicalError(error) {
+    const el = $("technicalError");
+    if (!error) { el.textContent = ""; el.classList.remove("show"); return; }
+    let text = "";
+    try {
+        text = typeof error === "string" ? error : JSON.stringify({
+            name: error.name, message: error.message,
+            code: error.code, details: error.details, hint: error.hint
+        }, null, 2);
+    } catch { text = String(error); }
+    el.textContent = text;
+    el.classList.add("show");
+}
 
-function formatPrice(value){
-
-    if(
-        value === null ||
-        value === undefined ||
-        value === ""
-    ){
-
-        return "-";
-
+/* ============================================================
+   CONNECTION
+============================================================ */
+function setConnectionUI(online, message) {
+    databaseOnline = online;
+    $("statusDot").classList.toggle("offline", !online);
+    const banner = $("offlineBanner");
+    if (online) {
+        banner.classList.remove("show");
+    } else {
+        $("offlineBannerText").textContent = "🔴 " + (message || "اتصال به دیتابیس برقرار نیست");
+        banner.classList.add("show");
     }
-
-    return Number(value)
-        .toLocaleString("en-US");
-
 }
 
-
-/* =========================================================
-   NORMALIZE SEARCH TEXT
-   ========================================================= */
-
-function normalizeText(text){
-
-    return String(text || "")
-        .toLowerCase()
-        .replace(/ي/g,"ی")
-        .replace(/ى/g,"ی")
-        .replace(/ك/g,"ک")
-        .replace(/ۀ/g,"ه")
-        .replace(/ة/g,"ه")
-        .replace(/\u200c/g," ")
-        .replace(/\s+/g," ")
-        .trim();
-
-}
-
-
-/* =========================================================
-   SEARCH TOKENS
-   ========================================================= */
-
-function textMatches(productName, query){
-
-    const name =
-        normalizeText(productName);
-
-    const words =
-        normalizeText(query)
-        .split(" ")
-        .filter(Boolean);
-
-
-    if(!words.length)
+async function checkConnection() {
+    if (!db) { setConnectionUI(false, "تنظیمات Supabase وارد نشده است."); return false; }
+    try {
+        const result = await db.from("products").select("code").limit(1);
+        if (result.error) throw result.error;
+        setConnectionUI(true);
+        return true;
+    } catch (error) {
+        console.error("Connection error:", error);
+        setConnectionUI(false, supabaseErrorMessage(error));
         return false;
-
-
-    return words.every(
-        word =>
-        name.includes(word)
-    );
-
+    }
 }
 
+function supabaseErrorMessage(error) {
+    if (!error) return "خطایی در ارتباط با دیتابیس رخ داد.";
+    const message = (String(error.message||"") + " " + String(error.details||"") + " " + String(error.hint||"")).toLowerCase();
+    const code = String(error.code || "");
+    if (message.includes("schema cache") || message.includes("could not find the table") ||
+        (message.includes("relation") && message.includes("does not exist"))) {
+        return "جدول products در Supabase پیدا نشد.";
+    }
+    if (code === "42501" || message.includes("permission denied") || message.includes("row-level security") || message.includes("rls")) {
+        return "دسترسی این عملیات توسط RLS یا مجوزهای Supabase مسدود شده است.";
+    }
+    if (message.includes("failed to fetch") || message.includes("network") || message.includes("fetch")) {
+        return "اتصال به دیتابیس برقرار نشد.";
+    }
+    return "خطایی هنگام ارتباط با دیتابیس رخ داد.";
+}
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
+/* ============================================================
+   BARCODE / PRICE NORMALIZATION
+============================================================ */
+function normalizeBarcode(value) {
+    if (value === null || value === undefined) return "";
+    let code = String(value).trim();
+    code = code.replace(/^\s*\(\s*/, "").replace(/\s*\)\s*$/, "");
+    const persian = "۰۱۲۳۴۵۶۷۸۹", arabic = "٠١٢٣٤٥٦٧٨٩";
+    code = code.replace(/[۰-۹]/g, c => String(persian.indexOf(c)));
+    code = code.replace(/[٠-٩]/g, c => String(arabic.indexOf(c)));
+    code = code.replace(/\s/g, "");
+    if (/^\d+\.0+$/.test(code)) code = code.substring(0, code.indexOf("."));
+    return code;
+}
+function isValidBarcode(code) {
+    code = normalizeBarcode(code);
+    return /^\d{1,32}$/.test(code);
+}
 
-async function searchProduct(){
+function normalizePrice(value) {
+    if (value === null || value === undefined) return null;
+    let text = String(value).trim();
+    if (!text) return null;
+    const persian = "۰۱۲۳۴۵۶۷۸۹", arabic = "٠١٢٣٤٥٦٧٨٩";
+    text = text.replace(/[۰-۹]/g, c => String(persian.indexOf(c)));
+    text = text.replace(/[٠-٩]/g, c => String(arabic.indexOf(c)));
+    text = text.replace(/,/g, "").replace(/٬/g, "").replace(/\s/g, "").replace(/ریال/g, "").replace(/تومان/g, "");
+    if (!/^\d+$/.test(text)) return null;
+    const number = Number(text);
+    if (!Number.isSafeInteger(number) || number < 0) return null;
+    return number;
+}
 
-    const input =
-        document.getElementById(
-            "searchInput"
-        );
+function formatPrice(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "-";
+    return new Intl.NumberFormat("en-US").format(number) + " ریال";
+}
+function formatPriceInput(value) {
+    const number = normalizePrice(value);
+    if (number === null) return "";
+    return new Intl.NumberFormat("en-US").format(number);
+}
 
+/* ============================================================
+   AUTO-HIDE TIMER (کارت محصول)
+============================================================ */
+function startAutoHideTimer() {
+    clearAutoHideTimer();
+    const bar = $("cardTimerBar");
+    bar.classList.remove("running");
+    void bar.offsetWidth;
+    bar.style.transitionDuration = AUTO_HIDE_MS + "ms";
+    bar.classList.add("running");
+    autoHideTimer = setTimeout(() => { hideProduct(); }, AUTO_HIDE_MS);
+}
+function clearAutoHideTimer() {
+    if (autoHideTimer) { clearTimeout(autoHideTimer); autoHideTimer = null; }
+    const bar = $("cardTimerBar");
+    bar.classList.remove("running");
+    bar.style.transform = "scaleX(1)";
+}
+function isEditingSomething() {
+    return $("editBox").classList.contains("show") || $("descriptionEditor").classList.contains("show");
+}
+function resetAutoHideTimer() {
+    if (currentProduct && !isEditingSomething()) startAutoHideTimer();
+}
 
-    let query =
-        input.value.trim();
+/* ============================================================
+   UNIFIED SEARCH (هدر) - تشخیص بارکد یا نام
+============================================================ */
+function hideResultsList() {
+    const el = $("resultsList");
+    el.innerHTML = "";
+    el.classList.remove("show");
+}
 
+$("unifiedSearchInput").addEventListener("input", () => {
+    clearTimeout(searchDebounceTimer);
+    const value = $("unifiedSearchInput").value;
+    searchDebounceTimer = setTimeout(() => runUnifiedSearch(value), SEARCH_DEBOUNCE_MS);
+});
 
-    if(!query){
+$("unifiedSearchInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        clearTimeout(searchDebounceTimer);
+        runUnifiedSearch($("unifiedSearchInput").value);
+    }
+});
 
-        showToast(
-            "کد یا نام محصول را وارد کنید."
-        );
+async function runUnifiedSearch(rawValue) {
+    const value = (rawValue || "").trim();
+    showTechnicalError(null);
 
+    if (!value) {
+        hideResultsList();
+        hideStatus("searchStatus");
         return;
-
     }
 
+    // تشخیص: اگه فقط رقم بود => بارکد؛ وگرنه => نام
+    const isNumericOnly = /^[0-9۰-۹٠-٩\s]+$/.test(value);
 
-    query =
-        String(query);
+    if (isNumericOnly) {
+        hideResultsList();
+        await searchByBarcode(value);
+    } else {
+        await searchByName(value);
+    }
+}
 
+/* ============================================================
+   SEARCH BY BARCODE
+============================================================ */
+async function searchByBarcode(rawCode) {
+    const code = normalizeBarcode(rawCode);
 
-    /*
-       ابتدا بررسی می‌کنیم آیا
-       دقیقاً کد محصول است یا خیر.
-    */
+    if (!isValidBarcode(code)) {
+        hideProduct();
+        showStatus("searchStatus", "بارکد معتبر نیست.", "error");
+        return;
+    }
+    if (!db) {
+        showStatus("searchStatus", "تنظیمات Supabase وارد نشده است.", "error");
+        return;
+    }
 
+    showStatus("searchStatus", "در حال جستجو...", "warning");
 
-    showToast(
-        "در حال جستجو..."
-    );
+    try {
+        const result = await db.from("products").select("*").eq("code", code).maybeSingle();
+        if (result.error) throw result.error;
 
+        const data = result.data;
+        if (!data) {
+            hideProduct();
+            showStatus("searchStatus", "محصولی با این بارکد در دیتابیس وجود ندارد.", "warning");
+            return;
+        }
 
-    const result =
-        await db
-        .from("products")
-        .select(
-            "code,name,price,previous_price,description"
-        )
-        .eq("code",query)
-        .maybeSingle();
+        currentProduct = {
+            code: normalizeBarcode(data.code),
+            name: data.name || "",
+            price: data.price,
+            previous_price: data.previous_price,
+            description: data.description || ""
+        };
 
+        renderProduct(currentProduct);
+        showStatus("searchStatus", "محصول پیدا شد.", "success");
+        setConnectionUI(true);
 
-    if(result.error){
+    } catch (error) {
+        console.error("Search error:", error);
+        hideProduct();
+        showStatus("searchStatus", supabaseErrorMessage(error), "error");
+        showTechnicalError(error);
+        setConnectionUI(false, supabaseErrorMessage(error));
+    }
+}
 
-        console.error(
-            result.error
-        );
+/* ============================================================
+   SEARCH BY NAME (fuzzy - بدون توجه به ترتیب کلمات)
+============================================================ */
+async function searchByName(query) {
+    hideProduct();
 
+    if (!db) {
+        showStatus("searchStatus", "تنظیمات Supabase وارد نشده است.", "error");
+        return;
+    }
 
-        /*
-           اگر ستون description
-           در دیتابیس وجود نداشته باشد،
-           یک بار بدون آن امتحان می‌کنیم.
-        */
+    const words = query.split(/\s+/).filter(Boolean);
 
-        const fallback =
-            await db
-            .from("products")
-            .select(
-                "code,name,price,previous_price"
-            )
-            .eq("code",query)
+    showStatus("searchStatus", "در حال جستجو...", "warning");
+
+    try {
+        let queryBuilder = db.from("products").select("*");
+        words.forEach(word => { queryBuilder = queryBuilder.ilike("name", `%${word}%`); });
+
+        const result = await queryBuilder.limit(20);
+        if (result.error) throw result.error;
+
+        const rows = result.data || [];
+
+        if (!rows.length) {
+            hideResultsList();
+            showStatus("searchStatus", "محصولی با این نام پیدا نشد.", "warning");
+            return;
+        }
+
+        renderResultsList(rows);
+        hideStatus("searchStatus");
+        setConnectionUI(true);
+
+    } catch (error) {
+        console.error("Name search error:", error);
+        hideResultsList();
+        showStatus("searchStatus", supabaseErrorMessage(error), "error");
+        showTechnicalError(error);
+        setConnectionUI(false, supabaseErrorMessage(error));
+    }
+}
+
+function renderResultsList(rows) {
+    const container = $("resultsList");
+    container.innerHTML = "";
+
+    rows.forEach(row => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "result-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "result-name";
+        nameSpan.textContent = row.name || "بدون نام";
+
+        const priceSpan = document.createElement("span");
+        priceSpan.className = "result-price";
+        priceSpan.textContent = formatPrice(row.price);
+
+        btn.append(nameSpan, priceSpan);
+
+        btn.addEventListener("click", () => {
+            currentProduct = {
+                code: normalizeBarcode(row.code),
+                name: row.name || "",
+                price: row.price,
+                previous_price: row.previous_price,
+                description: row.description || ""
+            };
+            hideResultsList();
+            $("unifiedSearchInput").value = "";
+            renderProduct(currentProduct);
+            showStatus("searchStatus", "محصول پیدا شد.", "success");
+        });
+
+        container.appendChild(btn);
+    });
+
+    container.classList.add("show");
+}
+
+/* ============================================================
+   RENDER PRODUCT
+============================================================ */
+function renderProduct(product) {
+    $("productName").textContent = product.name || "بدون نام";
+    $("currentPrice").textContent = formatPrice(product.price);
+    $("productCode").textContent = product.code;
+
+    renderDescriptionView(product.description);
+    $("descriptionEditor").classList.remove("show");
+
+    if (product.previous_price !== null && product.previous_price !== undefined) {
+        $("previousPrice").textContent = formatPrice(product.previous_price);
+    } else {
+        $("previousPrice").textContent = "قیمت قبلی ثبت نشده است.";
+    }
+
+    $("previousPriceBox").classList.remove("show");
+    $("previousPriceButton").textContent = "مشاهده قیمت قبلی";
+    $("editBox").classList.remove("show");
+    $("newPriceInput").value = "";
+
+    $("productCard").classList.add("show");
+    startAutoHideTimer();
+}
+
+function hideProduct() {
+    currentProduct = null;
+    clearAutoHideTimer();
+    $("productCard").classList.remove("show");
+    $("editBox").classList.remove("show");
+    $("previousPriceBox").classList.remove("show");
+    $("descriptionEditor").classList.remove("show");
+}
+
+$("productCard").addEventListener("click", resetAutoHideTimer);
+
+/* ============================================================
+   DESCRIPTION (همیشه قابل‌ویرایش)
+============================================================ */
+function renderDescriptionView(description) {
+    const el = $("productDescription");
+    const trimmed = (description || "").trim();
+    if (trimmed) {
+        el.textContent = trimmed;
+        el.classList.remove("empty");
+    } else {
+        el.textContent = "توضیحی ثبت نشده است.";
+        el.classList.add("empty");
+    }
+}
+
+function openDescriptionEditor() {
+    if (!currentProduct) return;
+    clearAutoHideTimer();
+    $("descriptionTextarea").value = currentProduct.description || "";
+    $("descriptionEditor").classList.add("show");
+    setTimeout(() => $("descriptionTextarea").focus(), 100);
+}
+
+function closeDescriptionEditor() {
+    $("descriptionEditor").classList.remove("show");
+    if (currentProduct) startAutoHideTimer();
+}
+
+async function saveDescription() {
+    if (!currentProduct) return;
+    if (!db) {
+        showStatus("searchStatus", "تنظیمات Supabase وارد نشده است.", "error");
+        return;
+    }
+
+    const newDescription = $("descriptionTextarea").value.trim();
+    $("saveDescriptionButton").disabled = true;
+
+    try {
+        const result = await db.from("products")
+            .update({ description: newDescription || null })
+            .eq("code", currentProduct.code)
+            .select("*")
             .maybeSingle();
 
+        if (result.error) throw result.error;
+        if (!result.data) throw new Error("UPDATE returned no row.");
 
-        if(fallback.error){
+        currentProduct.description = result.data.description || "";
+        renderDescriptionView(currentProduct.description);
+        closeDescriptionEditor();
+        showStatus("searchStatus", "توضیحات ذخیره شد.", "success");
+        setConnectionUI(true);
 
-            console.error(
-                fallback.error
-            );
-
-
-            showToast(
-                "خطای Supabase: " +
-                fallback.error.message
-            );
-
-            return;
-
-        }
-
-
-        if(fallback.data){
-
-            fallback.data.description =
-                "";
-
-            showProduct(
-                fallback.data
-            );
-
-            return;
-
-        }
-
+    } catch (error) {
+        console.error("Description save error:", error);
+        showStatus("searchStatus", "توضیحات ذخیره نشد. " + supabaseErrorMessage(error), "error");
+        showTechnicalError(error);
+        setConnectionUI(false, supabaseErrorMessage(error));
+    } finally {
+        $("saveDescriptionButton").disabled = false;
     }
-
-
-    if(result.data){
-
-        showProduct(
-            result.data
-        );
-
-        return;
-
-    }
-
-
-    /*
-       اگر کد پیدا نشد،
-       جستجوی نام را انجام می‌دهیم.
-    */
-
-
-    await searchByName(query);
-
 }
 
-
-/* =========================================================
-   SEARCH BY NAME
-   ========================================================= */
-
-async function searchByName(query){
-
-    const normalizedQuery =
-        normalizeText(query);
-
-
-    /*
-       اگر کش وجود داشته باشد،
-       جستجوی نام کاملاً محلی انجام می‌شود.
-    */
-
-    if(
-        cacheLoaded &&
-        localCache.length
-    ){
-
-        const matches =
-            localCache
-            .filter(
-                item =>
-                textMatches(
-                    item.name,
-                    normalizedQuery
-                )
-            )
-            .slice(0,50);
-
-
-        await showNameResults(
-            matches
-        );
-
-        return;
-
-    }
-
-
-    /*
-       در صورتی که کش دانلود نشده،
-       ابتدا یک جستجوی ساده در Supabase
-       انجام می‌دهیم.
-    */
-
-    const words =
-        normalizedQuery
-        .split(" ")
-        .filter(Boolean);
-
-
-    let queryBuilder =
-        db
-        .from("products")
-        .select(
-            "code,name,price,previous_price,description"
-        );
-
-
-    /*
-       برای جلوگیری از حساسیت
-       به ترتیب کلمات، هر کلمه
-       جداگانه بررسی می‌شود.
-    */
-
-    for(
-        const word
-        of words
-    ){
-
-        queryBuilder =
-            queryBuilder.ilike(
-                "name",
-                `%${word}%`
-            );
-
-    }
-
-
-    const result =
-        await queryBuilder
-        .limit(50);
-
-
-    if(result.error){
-
-        /*
-           fallback برای دیتابیس‌هایی
-           که description ندارند
-        */
-
-        let fallback =
-            db
-            .from("products")
-            .select(
-                "code,name,price,previous_price"
-            );
-
-
-        for(
-            const word
-            of words
-        ){
-
-            fallback =
-                fallback.ilike(
-                    "name",
-                    `%${word}%`
-                );
-
-        }
-
-
-        const retry =
-            await fallback.limit(50);
-
-
-        if(retry.error){
-
-            console.error(
-                retry.error
-            );
-
-            showToast(
-                "خطا در جستجو: " +
-                retry.error.message
-            );
-
-            return;
-
-        }
-
-
-        await showNameResults(
-            retry.data || []
-        );
-
-
-        return;
-
-    }
-
-
-    await showNameResults(
-        result.data || []
-    );
-
+/* ============================================================
+   EDIT / SAVE PRICE
+============================================================ */
+function openPriceEditor() {
+    if (!currentProduct) return;
+    clearAutoHideTimer();
+    $("newPriceInput").value = formatPriceInput(currentProduct.price);
+    $("editBox").classList.add("show");
+    setTimeout(() => $("newPriceInput").focus(), 100);
 }
 
+function closePriceEditor() {
+    $("editBox").classList.remove("show");
+    $("newPriceInput").value = "";
+    if (currentProduct) startAutoHideTimer();
+}
 
-/* =========================================================
-   SHOW NAME RESULTS
-   ========================================================= */
+async function savePrice() {
+    if (!currentProduct) return;
 
-async function showNameResults(products){
-
-    document
-    .getElementById("product")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("notFound")
-    .style.display =
-    "none";
-
-
-    const resultBox =
-        document.getElementById(
-            "results"
-        );
-
-
-    const list =
-        document.getElementById(
-            "resultList"
-        );
-
-
-    list.innerHTML =
-        "";
-
-
-    if(
-        !products ||
-        !products.length
-    ){
-
-        resultBox.style.display =
-            "none";
-
-
-        document
-        .getElementById("notFound")
-        .style.display =
-        "block";
-
-
+    const newPrice = normalizePrice($("newPriceInput").value);
+    if (newPrice === null) {
+        showStatus("searchStatus", "قیمت جدید معتبر نیست.", "error");
         return;
-
+    }
+    if (!db) {
+        showStatus("searchStatus", "تنظیمات Supabase وارد نشده است.", "error");
+        return;
     }
 
+    const oldPrice = currentProduct.price;
 
-    document
-    .getElementById("resultCount")
-    .innerText =
-    products.length +
-    " مورد";
+    if (newPrice === oldPrice) {
+        closePriceEditor();
+        showStatus("searchStatus", "قیمت تغییری نکرد.", "warning");
+        return;
+    }
 
+    $("savePriceButton").disabled = true;
 
-    products.forEach(
-        product => {
+    try {
+        const updateResult = await db.from("products")
+            .update({ price: newPrice, previous_price: oldPrice })
+            .eq("code", currentProduct.code)
+            .select("*")
+            .maybeSingle();
 
-            const item =
-                document.createElement(
-                    "div"
-                );
+        if (updateResult.error) throw updateResult.error;
+        if (!updateResult.data) throw new Error("UPDATE returned no row.");
 
+        currentProduct = {
+            code: normalizeBarcode(updateResult.data.code),
+            name: updateResult.data.name || "",
+            price: updateResult.data.price,
+            previous_price: updateResult.data.previous_price,
+            description: updateResult.data.description || ""
+        };
 
-            item.className =
-                "result-item";
+        renderProduct(currentProduct);
+        showStatus("searchStatus", "قیمت با موفقیت به‌روزرسانی شد.", "success");
+        setConnectionUI(true);
 
+    } catch (error) {
+        console.error("Price update error:", error);
+        showStatus("searchStatus", "قیمت ذخیره نشد. " + supabaseErrorMessage(error), "error");
+        showTechnicalError(error);
+        setConnectionUI(false, supabaseErrorMessage(error));
+    } finally {
+        $("savePriceButton").disabled = false;
+    }
+}
 
-            item.onclick =
-                function(){
+/* ============================================================
+   PREVIOUS PRICE TOGGLE
+============================================================ */
+function togglePreviousPrice() {
+    const box = $("previousPriceBox");
+    const button = $("previousPriceButton");
+    resetAutoHideTimer();
+    if (box.classList.contains("show")) {
+        box.classList.remove("show");
+        button.textContent = "مشاهده قیمت قبلی";
+    } else {
+        box.classList.add("show");
+        button.textContent = "مخفی کردن قیمت قبلی";
+    }
+}
 
-                    showProduct(
-                        product
-                    );
+/* ============================================================
+   CAMERA / SCANNER (داخل صفحه، اسلاید به پایین)
+============================================================ */
+function cameraEnvironment() {
+    if (!window.isSecureContext) return { ok: false, message: "دسترسی به دوربین نیازمند HTTPS است." };
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia)
+        return { ok: false, message: "مرورگر از دسترسی استاندارد به دوربین پشتیبانی نمی‌کند." };
+    if (typeof Html5Qrcode === "undefined")
+        return { ok: false, message: "کتابخانه اسکن بارکد بارگذاری نشده است." };
+    return { ok: true };
+}
 
-                    window.scrollTo({
-                        top:0,
-                        behavior:"smooth"
-                    });
+function cameraErrorMessage(error) {
+    const name = error?.name || "";
+    if (name === "NotAllowedError") return "اجازه دسترسی به دوربین داده نشده است.";
+    if (name === "NotFoundError") return "دوربینی در دستگاه پیدا نشد.";
+    if (name === "NotReadableError") return "دوربین توسط برنامه دیگری در حال استفاده است.";
+    if (name === "SecurityError") return "دسترسی به دوربین به دلایل امنیتی مسدود شده است.";
+    return "خطا در دسترسی به دوربین.";
+}
 
+async function startScanner() {
+    showTechnicalError(null);
+    const environment = cameraEnvironment();
+
+    $("scannerInline").classList.add("open");
+    $("scannerActions").classList.add("hide");
+
+    if (!environment.ok) {
+        showStatus("searchStatus", environment.message, "error");
+        $("scannerActions").classList.remove("hide");
+        return;
+    }
+
+    if (scannerRunning) return;
+    $("startScannerButton").disabled = true;
+
+    try {
+        scanner = new Html5Qrcode("reader");
+
+        const config = {
+            fps: 10,
+            qrbox: function(width, height) {
+                return {
+                    width: Math.max(Math.min(width * .78, 300), 200),
+                    height: Math.max(Math.min(height * .22, 80), 65)
                 };
-
-
-            const info =
-                document.createElement(
-                    "div"
-                );
-
-
-            info.className =
-                "result-info";
-
-
-            const code =
-                document.createElement(
-                    "div"
-                );
-
-
-            code.className =
-                "result-code";
-
-
-            code.innerText =
-                product.code;
-
-
-            const name =
-                document.createElement(
-                    "div"
-                );
-
-
-            name.className =
-                "result-name";
-
-
-            name.innerText =
-                product.name;
-
-
-            info.appendChild(
-                code
-            );
-
-
-            info.appendChild(
-                name
-            );
-
-
-            const price =
-                document.createElement(
-                    "div"
-                );
-
-
-            price.className =
-                "result-price";
-
-
-            price.innerText =
-                formatPrice(
-                    product.price
-                ) +
-                " ریال";
-
-
-            item.appendChild(
-                info
-            );
-
-
-            item.appendChild(
-                price
-            );
-
-
-            list.appendChild(
-                item
-            );
-
-        }
-    );
-
-
-    resultBox.style.display =
-        "block";
-
-}
-
-
-/* =========================================================
-   SHOW PRODUCT
-   ========================================================= */
-
-function showProduct(product){
-
-    currentProduct =
-        product;
-
-
-    document
-    .getElementById("notFound")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("results")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("product")
-    .style.display =
-    "block";
-
-
-    document
-    .getElementById("productCode")
-    .innerText =
-    "کد: " +
-    product.code;
-
-
-    document
-    .getElementById("productName")
-    .innerText =
-    product.name;
-
-
-    document
-    .getElementById("productPrice")
-    .innerText =
-    formatPrice(
-        product.price
-    );
-
-
-    document
-    .getElementById("previousPrice")
-    .innerText =
-        product.previous_price == null
-        ? "ثبت نشده"
-        : formatPrice(
-            product.previous_price
-        );
-
-
-    const description =
-        document.getElementById(
-            "productDescription"
-        );
-
-
-    description.innerText =
-        product.description ||
-        "توضیحاتی برای این محصول ثبت نشده است.";
-
-
-    if(
-        product.description
-    ){
-
-        description.classList.remove(
-            "empty"
-        );
-
-    }
-    else{
-
-        description.classList.add(
-            "empty"
-        );
-
-    }
-
-
-    document
-    .getElementById("previous")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("edit")
-    .style.display =
-    "none";
-
-}
-
-
-/* =========================================================
-   NOT FOUND
-   ========================================================= */
-
-function showNotFound(){
-
-    currentProduct =
-        null;
-
-
-    document
-    .getElementById("product")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("results")
-    .style.display =
-    "none";
-
-
-    document
-    .getElementById("notFound")
-    .style.display =
-    "block";
-
-}
-
-
-/* =========================================================
-   EDIT
-   ========================================================= */
-
-function toggleEdit(){
-
-    if(!currentProduct)
-        return;
-
-
-    const box =
-        document.getElementById(
-            "edit"
-        );
-
-
-    if(
-        box.style.display ===
-        "block"
-    ){
-
-        box.style.display =
-            "none";
-
-        return;
-
-    }
-
-
-    box.style.display =
-        "block";
-
-
-    document
-    .getElementById("newPrice")
-    .value =
-        currentProduct.price == null
-        ? ""
-        : formatPrice(
-            currentProduct.price
-        );
-
-
-    document
-    .getElementById("newDescription")
-    .value =
-        currentProduct.description ||
-        "";
-
-}
-
-
-/* =========================================================
-   PREVIOUS
-   ========================================================= */
-
-function togglePrevious(){
-
-    if(!currentProduct)
-        return;
-
-
-    const box =
-        document.getElementById(
-            "previous"
-        );
-
-
-    box.style.display =
-        box.style.display ===
-        "block"
-        ? "none"
-        : "block";
-
-}
-
-
-/* =========================================================
-   SAVE PRICE / DESCRIPTION
-   ========================================================= */
-
-async function savePrice(){
-
-    if(!currentProduct)
-        return;
-
-
-    let value =
-        document
-        .getElementById(
-            "newPrice"
-        )
-        .value
-        .replace(/,/g,"")
-        .replace(/[^\d]/g,"");
-
-
-    const newPrice =
-        Number(value);
-
-
-    if(
-        !newPrice ||
-        newPrice <= 0
-    ){
-
-        showToast(
-            "قیمت صحیح وارد کنید."
-        );
-
-        return;
-
-    }
-
-
-    const newDescription =
-        document
-        .getElementById(
-            "newDescription"
-        )
-        .value
-        .trim();
-
-
-    const oldPrice =
-        currentProduct.price;
-
-
-    showToast(
-        "در حال ذخیره..."
-    );
-
-
-    /*
-       ساختار اصلی update
-       مطابق کد مادر است.
-    */
-
-    let updateData = {
-
-        price:
-            newPrice,
-
-        previous_price:
-            oldPrice
-
-    };
-
-
-    /*
-       اگر description در جدول
-       وجود داشته باشد، ذخیره می‌شود.
-    */
-
-    updateData.description =
-        newDescription;
-
-
-    let result =
-        await db
-        .from("products")
-        .update(
-            updateData
-        )
-        .eq(
-            "code",
-            currentProduct.code
-        );
-
-
-    /*
-       اگر ستون description
-       در دیتابیس وجود نداشت،
-       قیمت را بدون description
-       ذخیره می‌کنیم.
-    */
-
-    if(result.error){
-
-        console.warn(
-            "Description update failed, retrying price only:",
-            result.error
-        );
-
-
-        result =
-            await db
-            .from("products")
-            .update({
-
-                price:
-                    newPrice,
-
-                previous_price:
-                    oldPrice
-
-            })
-            .eq(
-                "code",
-                currentProduct.code
-            );
-
-
-        if(result.error){
-
-            console.error(
-                result.error
-            );
-
-
-            showToast(
-                "خطا در ذخیره: " +
-                result.error.message
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    currentProduct.price =
-        newPrice;
-
-
-    currentProduct.previous_price =
-        oldPrice;
-
-
-    currentProduct.description =
-        newDescription;
-
-
-    showProduct(
-        currentProduct
-    );
-
-
-    showToast(
-        "تغییرات با موفقیت ذخیره شد."
-    );
-
-}
-
-
-/* =========================================================
-   START SCANNER
-   ========================================================= */
-
-async function startScanner(){
-
-    /*
-       اگر قبلاً فعال است،
-       دوباره راه‌اندازی نکن.
-    */
-
-    if(scanner){
-
-        showToast(
-            "دوربین در حال اسکن است."
-        );
-
-        return;
-
-    }
-
-
-    const reader =
-        document.getElementById(
-            "reader"
-        );
-
-
-    /*
-       اگر محتوای قبلی وجود داشت
-       پاک می‌کنیم.
-    */
-
-    reader.innerHTML =
-        "";
-
-
-    scanner =
-        new Html5Qrcode(
-            "reader"
-        );
-
-
-    const config = {
-
-        fps:10,
-
-        qrbox:{
-
-            width:240,
-
-            height:80
-
-        },
-
-        aspectRatio:
-            3 / 1,
-
-        rememberLastUsedCamera:true,
-
-        showTorchButtonIfSupported:true,
-
-        formatsToSupport:[
-
-            Html5QrcodeSupportedFormats.CODE_128,
-
-            Html5QrcodeSupportedFormats.CODE_39,
-
-            Html5QrcodeSupportedFormats.CODE_93,
-
-            Html5QrcodeSupportedFormats.EAN_13,
-
-            Html5QrcodeSupportedFormats.EAN_8,
-
-            Html5QrcodeSupportedFormats.ITF,
-
-            Html5QrcodeSupportedFormats.UPC_A,
-
-            Html5QrcodeSupportedFormats.UPC_E
-
-        ]
-
-    };
-
-
-    try{
-
-        /*
-           روش اصلی دقیقاً مشابه
-           منطق کد مادر:
-           دوربین محیط پشت دستگاه.
-        */
-
-        await scanner.start(
-
-            {
-                facingMode:{
-                    ideal:"environment"
-                }
             },
+            aspectRatio: 1.777778
+        };
 
-            config,
-
-            onBarcodeSuccess,
-
-            function(){}
-
-        );
-
-
-        showToast(
-            "دوربین آماده اسکن است."
-        );
-
-
-    }
-    catch(error){
-
-        console.error(
-            "Camera start error:",
-            error
-        );
-
-
-        /*
-           روش دوم:
-           دریافت لیست دوربین‌ها.
-        */
-
-        try{
-
-            const cameras =
-                await Html5Qrcode
-                .getCameras();
-
-
-            if(
-                cameras &&
-                cameras.length
-            ){
-
-                const backCamera =
-                    cameras.find(
-                        camera =>
-                        /back|rear|environment/i
-                        .test(
-                            camera.label
-                        )
-                    );
-
-
-                const cameraId =
-                    backCamera
-                    ? backCamera.id
-                    : cameras[0].id;
-
-
-                await scanner.start(
-
-                    cameraId,
-
-                    config,
-
-                    onBarcodeSuccess,
-
-                    function(){}
-
-                );
-
-
-                showToast(
-                    "دوربین آماده اسکن است."
-                );
-
-
-                return;
-
-            }
-
-
-        }
-        catch(secondError){
-
-            console.error(
-                "Camera fallback error:",
-                secondError
-            );
-
+        if (typeof Html5QrcodeSupportedFormats !== "undefined") {
+            config.formatsToSupport = [
+                Html5QrcodeSupportedFormats.CODE_128,
+                Html5QrcodeSupportedFormats.CODE_39,
+                Html5QrcodeSupportedFormats.EAN_13,
+                Html5QrcodeSupportedFormats.EAN_8,
+                Html5QrcodeSupportedFormats.UPC_A,
+                Html5QrcodeSupportedFormats.UPC_E,
+                Html5QrcodeSupportedFormats.ITF
+            ];
         }
 
+        await scanner.start({ facingMode: "environment" }, config, onBarcodeDetected, function() {});
+        scannerRunning = true;
 
-        await stopScanner();
-
-
-        showToast(
-            "دوربین در دسترس نیست. اجازه دوربین و HTTPS سایت را بررسی کنید."
-        );
-
+    } catch (error) {
+        console.error("Scanner error:", error);
+        scannerRunning = false;
+        showStatus("searchStatus", cameraErrorMessage(error), "error");
+        showTechnicalError(error);
+        $("scannerActions").classList.remove("hide");
+    } finally {
+        $("startScannerButton").disabled = false;
     }
-
 }
 
+async function onBarcodeDetected(decodedText) {
+    const code = normalizeBarcode(decodedText);
+    if (!isValidBarcode(code)) return;
 
-/* =========================================================
-   BARCODE SUCCESS
-   ========================================================= */
+    const now = Date.now();
+    if (code === lastDetectedCode && now - lastDetectedTime < 1500) return;
+    lastDetectedCode = code;
+    lastDetectedTime = now;
 
-async function onBarcodeSuccess(
-    decodedText
-){
+    $("unifiedSearchInput").value = code;
+    await closeScanner();
+    await searchByBarcode(code);
+}
 
-    const code =
-        String(
-            decodedText
-        )
-        .trim();
+async function stopScanner() {
+    if (!scanner || !scannerRunning) return;
+    try { await scanner.stop(); }
+    catch (error) { console.error("Scanner stop error:", error); }
+    finally { scannerRunning = false; }
+}
 
-
-    if(!code)
-        return;
-
-
-    /*
-       توقف سریع دوربین
-       تا چند بار اسکن نشود.
-    */
-
+async function closeScanner() {
     await stopScanner();
-
-
-    document
-    .getElementById(
-        "searchInput"
-    )
-    .value =
-    code;
-
-
-    searchProduct();
-
+    $("scannerInline").classList.remove("open");
+    setTimeout(() => { $("reader").innerHTML = ""; }, 320);
+    scanner = null;
 }
 
-
-/* =========================================================
-   STOP SCANNER
-   ========================================================= */
-
-async function stopScanner(){
-
-    if(scanner){
-
-        try{
-
-            await scanner.stop();
-
-        }
-        catch(e){}
-
-
-        try{
-
-            await scanner.clear();
-
-        }
-        catch(e){}
-
-
-        scanner =
-            null;
-
-    }
-
-
-    const reader =
-        document.getElementById(
-            "reader"
-        );
-
-
-    if(reader){
-
-        reader.innerHTML =
-            "";
-
-    }
-
+/* ============================================================
+   EXCEL HEADER MATCHING
+============================================================ */
+function normalizeHeader(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+        .replace(/\u200c/g, "").replace(/\u200f/g, "").replace(/\u200e/g, "").replace(/\uFEFF/g, "")
+        .replace(/\s+/g, "").trim();
 }
 
+function findExcelColumns(headerRow) {
+    const headers = headerRow.map(normalizeHeader);
+    function find(expected) {
+        const target = normalizeHeader(expected);
+        return headers.findIndex(h => h === target);
+    }
+    return {
+        barcode: find("بارکد"),
+        name: find("نام کامل کالا"),
+        price: find("فروش نقدی"),
+        description: find("توضیحات")
+    };
+}
 
-/* =========================================================
-   DOWNLOAD CACHE
-   ========================================================= */
+function normalizeExcelBarcode(value) {
+    if (value === null || value === undefined) return "";
+    let code = String(value).trim();
+    code = code.replace(/^\s*\(\s*/, "").replace(/\s*\)\s*$/, "");
+    const persian = "۰۱۲۳۴۵۶۷۸۹", arabic = "٠١٢٣٤٥٦٧٨٩";
+    code = code.replace(/[۰-۹]/g, c => String(persian.indexOf(c)));
+    code = code.replace(/[٠-٩]/g, c => String(arabic.indexOf(c)));
+    code = code.replace(/\s/g, "");
+    if (/^\d+\.0+$/.test(code)) code = code.substring(0, code.indexOf("."));
+    return code;
+}
 
-async function downloadCache(){
+/* ============================================================
+   EXCEL FILE HANDLING
+============================================================ */
+$("excelFileInput").addEventListener("change", handleExcelFile);
 
-    const button =
-        document.querySelector(
-            ".cache-button"
-        );
+async function handleExcelFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
+    importedProducts = [];
+    hideStatus("excelStatus");
+    $("previewBox").classList.remove("show");
+    showLoading("در حال خواندن فایل Excel...");
 
-    const progress =
-        document.getElementById(
-            "cacheProgress"
-        );
+    try {
+        if (typeof XLSX === "undefined") throw new Error("کتابخانه Excel بارگذاری نشده است.");
 
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array", cellDates: false, cellNF: true, raw: false });
+        if (!workbook.SheetNames?.length) throw new Error("فایل Excel فاقد Sheet است.");
 
-    const progressBar =
-        document.getElementById(
-            "cacheProgressBar"
-        );
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" });
+        if (!rows.length) throw new Error("فایل Excel خالی است.");
 
-
-    button.disabled =
-        true;
-
-
-    progress.style.display =
-        "block";
-
-
-    progressBar.style.width =
-        "5%";
-
-
-    showToast(
-        "در حال دریافت نام محصولات..."
-    );
-
-
-    try{
-
-        /*
-           فقط code و name دریافت می‌شود.
-           بنابراین حجم اطلاعات بسیار کمتر
-           از دریافت کل دیتابیس است.
-        */
-
-        const allProducts =
-            [];
-
-
-        const batchSize =
-            1000;
-
-
-        let from =
-            0;
-
-
-        while(true){
-
-            const to =
-                from +
-                batchSize -
-                1;
-
-
-            const result =
-                await db
-                .from("products")
-                .select(
-                    "code,name"
-                )
-                .range(
-                    from,
-                    to
-                );
-
-
-            if(result.error){
-
-                console.error(
-                    result.error
-                );
-
-
-                showToast(
-                    "خطا در دریافت کش: " +
-                    result.error.message
-                );
-
-
-                button.disabled =
-                    false;
-
-
-                progress.style.display =
-                    "none";
-
-
-                return;
-
-            }
-
-
-            const rows =
-                result.data ||
-                [];
-
-
-            allProducts.push(
-                ...rows
-            );
-
-
-            progressBar.style.width =
-                Math.min(
-                    95,
-                    Math.round(
-                        allProducts.length /
-                        Math.max(
-                            allProducts.length,
-                            1
-                        ) *
-                        100
-                    )
-                ) +
-                "%";
-
-
-            if(
-                rows.length <
-                batchSize
-            ){
-
+        let headerIndex = -1, columns = null;
+        for (let i = 0; i < Math.min(rows.length, 20); i++) {
+            const detected = findExcelColumns(rows[i] || []);
+            if (detected.barcode !== -1 && detected.name !== -1 && detected.price !== -1) {
+                headerIndex = i;
+                columns = detected;
                 break;
+            }
+        }
 
+        if (headerIndex === -1) {
+            showStatus("excelStatus", "ستون‌های «بارکد»، «نام کامل کالا» و «فروش نقدی» پیدا نشدند.", "error");
+            return;
+        }
+
+        const products = [];
+        const invalidRows = [];
+
+        for (let i = headerIndex + 1; i < rows.length; i++) {
+            const row = rows[i] || [];
+            const rawBarcode = row[columns.barcode];
+            const rawName = row[columns.name];
+            const rawPrice = row[columns.price];
+            const rawDescription = columns.description !== -1 ? row[columns.description] : "";
+
+            const empty = [rawBarcode, rawName, rawPrice].every(v => String(v ?? "").trim() === "");
+            if (empty) continue;
+
+            const code = normalizeExcelBarcode(rawBarcode);
+            const name = String(rawName ?? "").trim();
+            const price = normalizePrice(rawPrice);
+            const description = String(rawDescription ?? "").trim();
+
+            const valid = isValidBarcode(code) && name.length > 0 && price !== null;
+
+            if (!valid) {
+                invalidRows.push({ row: i + 1, code, name, price });
+                continue;
             }
 
-
-            from +=
-                batchSize;
-
+            products.push({ code: String(code), name, price, description });
         }
 
-
-        /*
-           حذف موارد ناقص
-        */
-
-        localCache =
-            allProducts
-            .filter(
-                item =>
-                item.code !== null &&
-                item.name !== null
-            )
-            .map(
-                item => ({
-
-                    code:
-                        String(
-                            item.code
-                        ),
-
-                    name:
-                        String(
-                            item.name
-                        )
-
-                })
-            );
-
-
-        /*
-           ذخیره دائمی در LocalStorage
-        */
-
-        localStorage.setItem(
-            "newface_product_cache",
-            JSON.stringify(
-                localCache
-            )
-        );
-
-
-        localStorage.setItem(
-            "newface_product_cache_time",
-            String(
-                Date.now()
-            )
-        );
-
-
-        cacheLoaded =
-            true;
-
-
-        progressBar.style.width =
-            "100%";
-
-
-        updateCacheStatus();
-
-
-        showToast(
-            localCache.length.toLocaleString("en-US") +
-            " محصول در کش ذخیره شد."
-        );
-
-
-        setTimeout(
-            function(){
-
-                progress.style.display =
-                    "none";
-
-            },
-            700
-        );
-
-
-    }
-    catch(error){
-
-        console.error(
-            error
-        );
-
-
-        showToast(
-            "خطا در دانلود کش."
-        );
-
-
-        progress.style.display =
-            "none";
-
-    }
-
-
-    button.disabled =
-        false;
-
-}
-
-
-/* =========================================================
-   LOAD LOCAL CACHE
-   ========================================================= */
-
-function loadLocalCache(){
-
-    try{
-
-        const saved =
-            localStorage.getItem(
-                "newface_product_cache"
-            );
-
-
-        if(!saved){
-
-            cacheLoaded =
-                false;
-
-            updateCacheStatus();
-
+        if (!products.length) {
+            showStatus("excelStatus", "هیچ محصول معتبر و قابل وارد کردنی پیدا نشد.", "error");
             return;
-
         }
 
+        importedProducts = products;
+        renderExcelPreview(products, invalidRows);
 
-        const parsed =
-            JSON.parse(
-                saved
-            );
-
-
-        if(
-            Array.isArray(parsed)
-        ){
-
-            localCache =
-                parsed;
-
-            cacheLoaded =
-                true;
-
-        }
-
+    } catch (error) {
+        console.error("Excel error:", error);
+        showStatus("excelStatus", "خطایی هنگام خواندن فایل Excel رخ داد.", "error");
+        showTechnicalError(error);
+    } finally {
+        hideLoading();
     }
-    catch(error){
-
-        console.error(
-            error
-        );
-
-
-        localCache =
-            [];
-
-        cacheLoaded =
-            false;
-
-    }
-
-
-    updateCacheStatus();
-
 }
 
+function renderExcelPreview(products, invalidRows) {
+    $("previewBox").classList.add("show");
 
-/* =========================================================
-   CACHE STATUS
-   ========================================================= */
-
-function updateCacheStatus(){
-
-    const element =
-        document.getElementById(
-            "cacheStatus"
-        );
-
-
-    if(
-        cacheLoaded &&
-        localCache.length
-    ){
-
-        element.innerText =
-            "کش: " +
-            localCache.length.toLocaleString(
-                "en-US"
-            );
-
+    let summary = "تعداد محصولات: " + products.length.toLocaleString("en-US");
+    if (invalidRows.length) {
+        summary += " • ردیف‌های خطادار: " + invalidRows.length.toLocaleString("en-US");
     }
-    else{
-
-        element.innerText =
-            "کش: آماده";
-
+    const errorRatio = invalidRows.length / (products.length + invalidRows.length);
+    if (errorRatio > 0.05) {
+        summary += " ⚠️ نسبت ردیف‌های خطادار بالاست، ستون‌بندی اکسل را بررسی کنید.";
     }
+    $("previewSummary").textContent = summary;
 
+    const tbody = $("previewTableBody");
+    tbody.innerHTML = "";
+
+    products.slice(0, 10).forEach(product => {
+        const tr = document.createElement("tr");
+        const code = document.createElement("td");
+        code.className = "barcode-cell";
+        code.textContent = product.code;
+        const name = document.createElement("td");
+        name.textContent = product.name;
+        const price = document.createElement("td");
+        price.textContent = formatPrice(product.price);
+        tr.append(code, name, price);
+        tbody.appendChild(tr);
+    });
+
+    showStatus("excelStatus", "اطلاعات Excel با موفقیت خوانده شد و آماده ورود به دیتابیس است.", "success");
 }
 
-
-/* =========================================================
-   SEARCH ENTER
-   ========================================================= */
-
-document
-.getElementById(
-    "searchInput"
-)
-.addEventListener(
-    "keydown",
-    function(event){
-
-        if(
-            event.key ===
-            "Enter"
-        ){
-
-            clearTimeout(
-                searchTimer
-            );
-
-
-            searchProduct();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   FAST SEARCH INPUT
-   ========================================================= */
-
-document
-.getElementById(
-    "searchInput"
-)
-.addEventListener(
-    "input",
-    function(){
-
-        /*
-           فقط برای جستجوی نام،
-           کمی تأخیر می‌گذاریم تا
-           با هر حرف درخواست شبکه
-           ارسال نشود.
-        */
-
-        clearTimeout(
-            searchTimer
-        );
-
-
-        const value =
-            this.value.trim();
-
-
-        if(
-            !value ||
-            value.length < 2
-        ){
-
-            return;
-
-        }
-
-
-        /*
-           اگر کش فعال باشد،
-           جستجو کاملاً محلی است.
-        */
-
-        if(
-            cacheLoaded &&
-            localCache.length
-        ){
-
-            searchTimer =
-                setTimeout(
-                    function(){
-
-                        searchProduct();
-
-                    },
-                    250
-                );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   PRICE INPUT
-   ========================================================= */
-
-document
-.getElementById(
-    "newPrice"
-)
-.addEventListener(
-    "input",
-    function(){
-
-        let value =
-            this.value
-            .replace(
-                /[^\d]/g,
-                ""
-            );
-
-
-        if(!value){
-
-            this.value =
-                "";
-
-            return;
-
-        }
-
-
-        this.value =
-            Number(
-                value
-            )
-            .toLocaleString(
-                "en-US"
-            );
-
-    }
-);
-
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-
-let toastTimer;
-
-
-function showToast(message){
-
-    const toast =
-        document.getElementById(
-            "toast"
-        );
-
-
-    toast.innerText =
-        message;
-
-
-    toast.classList.add(
-        "show"
-    );
-
-
-    clearTimeout(
-        toastTimer
-    );
-
-
-    toastTimer =
-        setTimeout(
-            function(){
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            3000
-        );
-
+function cancelImport() {
+    if (importInProgress) return;
+    importedProducts = [];
+    $("previewBox").classList.remove("show");
+    $("excelFileInput").value = "";
+    $("previewTableBody").innerHTML = "";
+    hideStatus("excelStatus");
 }
 
+/* ============================================================
+   IMPORT (previous_price درست ثبت میشه)
+============================================================ */
+$("startImportButton").addEventListener("click", startExcelImport);
 
-/* =========================================================
-   STARTUP
-   ========================================================= */
+async function startExcelImport() {
+    if (importInProgress || !importedProducts.length) return;
+    if (!db) {
+        showStatus("excelStatus", "تنظیمات Supabase وارد نشده است.", "error");
+        return;
+    }
 
-loadLocalCache();
+    showTechnicalError(null);
+    importInProgress = true;
+    $("startImportButton").disabled = true;
+    $("cancelImportButton").disabled = true;
+    $("progressContainer").classList.add("show");
 
+    const total = importedProducts.length;
+    let successful = 0, failed = 0;
+    const errors = [];
 
-console.log(
-    "NewFace Price System loaded."
-);
+    try {
+        for (let start = 0; start < total; start += IMPORT_BATCH_SIZE) {
+            const end = Math.min(start + IMPORT_BATCH_SIZE, total);
+            const batch = importedProducts.slice(start, end);
+            const codes = batch.map(p => p.code);
 
+            try {
+                const existingResult = await db.from("products").select("code, price").in("code", codes);
+                if (existingResult.error) throw existingResult.error;
 
-console.log(
-    "Supabase URL:",
-    SUPABASE_URL
-);
+                const existingMap = new Map((existingResult.data || []).map(row => [String(row.code), row.price]));
 
+                const payload = batch.map(product => ({
+                    code: product.code,
+                    name: product.name,
+                    price: product.price,
+                    previous_price: existingMap.has(product.code) ? existingMap.get(product.code) : null,
+                    description: product.description || null
+                }));
+
+                const result = await db.from("products").upsert(payload, { onConflict: "code" });
+                if (result.error) throw result.error;
+
+                successful += batch.length;
+
+            } catch (error) {
+                console.error("Import batch error:", error);
+                failed += batch.length;
+                errors.push({ start, end, error });
+            }
+
+            const completed = Math.min(end, total);
+            const percent = Math.round((completed / total) * 100);
+            $("progressCount").textContent = `${completed} / ${total}`;
+            $("progressFill").style.width = percent + "%";
+        }
+
+        $("progressText").textContent = "وارد کردن به پایان رسید.";
+
+        if (failed === 0) {
+            showStatus("excelStatus", `وارد کردن با موفقیت انجام شد. تعداد موفق: ${successful.toLocaleString("en-US")} مورد.`, "success");
+        } else {
+            showStatus("excelStatus", `وارد کردن انجام شد. موفق: ${successful.toLocaleString("en-US")}، خطادار: ${failed.toLocaleString("en-US")}.`, "warning");
+            if (errors.length) showTechnicalError(errors);
+        }
+
+    } catch (error) {
+        console.error("Import error:", error);
+        showStatus("excelStatus", "خطایی هنگام وارد کردن اطلاعات رخ داد.", "error");
+        showTechnicalError(error);
+    } finally {
+        importInProgress = false;
+        $("startImportButton").disabled = false;
+        $("cancelImportButton").disabled = false;
+    }
+}
+
+/* ============================================================
+   EVENTS
+============================================================ */
+$("retryConnectionButton").addEventListener("click", checkConnection);
+
+$("startScannerButton").addEventListener("click", startScanner);
+$("retryScannerButton").addEventListener("click", async () => {
+    await stopScanner();
+    $("reader").innerHTML = "";
+    scanner = null;
+    await startScanner();
+});
+$("closeScannerButton").addEventListener("click", closeScanner);
+
+$("editPriceButton").addEventListener("click", openPriceEditor);
+$("previousPriceButton").addEventListener("click", togglePreviousPrice);
+$("savePriceButton").addEventListener("click", savePrice);
+$("cancelEditButton").addEventListener("click", closePriceEditor);
+
+$("editDescriptionButton").addEventListener("click", openDescriptionEditor);
+$("saveDescriptionButton").addEventListener("click", saveDescription);
+$("cancelDescriptionButton").addEventListener("click", closeDescriptionEditor);
+
+$("newPriceInput").addEventListener("input", e => {
+    const price = normalizePrice(e.target.value);
+    if (price !== null) e.target.value = new Intl.NumberFormat("en-US").format(price);
+});
+$("newPriceInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); savePrice(); }
+    if (e.key === "Escape") { e.preventDefault(); closePriceEditor(); }
+});
+
+$("cancelImportButton").addEventListener("click", cancelImport);
+
+/* ============================================================
+   INITIALIZATION
+============================================================ */
+document.addEventListener("DOMContentLoaded", async () => {
+    hideProduct();
+    await checkConnection();
+});
+
+window.addEventListener("online", checkConnection);
+window.addEventListener("offline", () => setConnectionUI(false, "اتصال اینترنت دستگاه قطع شده است."));
+
+document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible") await checkConnection();
+});
+
+/* CAMERA CLEANUP */
+window.addEventListener("beforeunload", () => {
+    if (scanner && scannerRunning) {
+        try { scanner.stop(); } catch {}
+    }
+});
 
 </script>
-
 
 </body>
 </html>
